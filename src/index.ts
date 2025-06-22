@@ -1,15 +1,17 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Bind resources to your worker in `wrangler.jsonc`. After adding bindings, a type definition for the
- * `Env` object can be regenerated with `npm run cf-typegen`.
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+import { Hono, Context, Next } from "hono";
+import { cors } from "hono/cors";
+import { handleRest } from "./rest";
+
+export interface Env {
+	DB_BLOG: D1Database;
+	DB_PROJECTS: D1Database;
+	DB_IMAGES: D1Database;
+	DB_VIDEOS: D1Database;
+	DB_MODELS: D1Database;
+	DB_COMMENTS: D1Database;
+	DB_USERS: D1Database;
+	SECRET: SecretsStoreSecret;
+}
 
 
 export default {
