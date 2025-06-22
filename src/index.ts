@@ -11,8 +11,20 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response('Hello World!');
+		const url = new URL(request.url);
+
+		if(url.pathname === "/api/blogs"){
+			const { results } = await env.DB_BLOG.prepare("SELECT * FROM posts ORDER BY created_at DESC").all();
+			return Response.json(results);
+		}
+
+		if(url.pathname === "/api/projects"){
+			const { results } = await env.DB_PROJECTS.prepare("SELECT * FROM projects ORDER BY created_at DESC").all();
+			return Response.json(results);
+		}
+		return new Response('Not Found', { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
