@@ -49,26 +49,18 @@ export default {
 		app.all('/rest/*', authMiddleware, handleRest);
 
 		app.get('/list/:bucket', authMiddleware, async (c) => {
-			const bucket = c.req.param('bucket');
-			const validBuckets = ['images', 'videos', 'models', 'assets'];
+			const bucketName = c.req.param('bucket');
+			const bucket = resolveBucket(c.env, bucketName);
 
-			if(!validBuckets.includes(bucket)) {
-				return c.json({ error: 'Invalid bucket' }, 400);
+			if (!bucket) {
+				return c.json({ error: `Bucket '${bucketName}' not found` }, 404);
 			}
 
-			const r2 = c.env[`${bucket.toUpperCase}_BUCKET` as keyof Env] as R2Bucket;
-
 			try {
-				const list = await r2.list();
-				const files = list.objects.map(obj => ({
-					key: obj.key,
-					size: obj.size,
-					uploaded: obj.uploaded,
-					httpEtag: obj.httpEtag,
-				}));
-				return c.json({ bucket, files });
-			} catch (err:any) {
-				return c.json({ error: err.message }, 500);
+				const objects = await bucket.list();
+				return c.json({ files: objects.objects });
+			} catch (err: any) {
+				return c.json({ error: err.message || 'Failed to list objects' }, 500);
 			}
 		});
 
