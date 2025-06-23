@@ -47,6 +47,31 @@
 			"database_id": "402bf4e6-b930-441b-815a-d73b292ee990"
 		}
 
+	],
+	"r2_buckets": [
+		{
+			"binding": "IMAGES_BUCKET",
+			"bucket_name": "images"
+		},
+		{
+			"binding": "VEDEOS_BUCKET",
+			"bucket_name": "videos"
+		},
+		{
+			"binding": "MODELS_BUCKET",
+			"bucket_name": "models"
+		},
+		{
+			"binding": "ASSETS_BUCKET",
+			"bucket_name": "assets"
+		}
+	],
+	"secrets_store_secrets": [
+		{
+			"store_id": "559db5b8e2964f808d20a87ab3394f93",
+			"binding": "SECRET",
+			"secret_name": "INTERNAL_API_KEY"
+		},
 	]
 	/**
 	 * Smart Placement

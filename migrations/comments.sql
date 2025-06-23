@@ -5,5 +5,6 @@ CREATE TABLE IF NOT EXISTS comments (
   content TEXT NOT NULL,
   parent_comment_id TEXT, -- For replies
   likes INTEGER DEFAULT 0,
+  flags INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
