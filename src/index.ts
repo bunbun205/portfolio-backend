@@ -70,19 +70,47 @@ export default {
 		});
 
 		// Upload asset to R2
-		app.post('/upload/:bucketName/:filename', authMiddleware, async (c) => {
-			const { bucketName, filename } = c.req.param();
-			const bucket = resolveBucket(env, bucketName);
-			if (!bucket) return c.json({ error: 'Invalid bucket' }, 400);
+		app.put('/upload/:bucket/:filename', authMiddleware, async (c) => {
+			const bucketName = c.req.param('bucket');
+			const filename = c.req.param('filename');
 
-			const contentType = c.req.header('content-type') ?? 'application/octet-stream';
+			if (!['images', 'videos', 'models', 'assets'].includes(bucketName)) {
+				return c.json({ error: 'Invalid bucket' }, 400);
+			}
+
+			const r2 = c.env[`${bucketName.toUpperCase()}_BUCKET` as keyof Env] as R2Bucket;
+			const contentType = c.req.header('content-type') || 'application/octet-stream';
 			const body = await c.req.arrayBuffer();
 
-			await bucket.put(filename, body, {
+			await r2.put(filename, body, {
 				httpMetadata: { contentType }
 			});
 
-			return c.json({ success: true, filename, contentType }, 201);
+			return c.json({ success: true, key: filename, url: `${bucketName}/${filename}` });
+		});
+
+		app.get('/list/:bucket', authMiddleware, async (c) => {
+			const bucket = c.req.param('bucket');
+			const validBuckets = ['images', 'videos', 'models', 'assets'];
+
+			if(!validBuckets.includes(bucket)) {
+				return c.json({ error: 'Invalid bucket' }, 400);
+			}
+
+			const r2 = c.env[`${bucket.toUpperCase}_BUCKET` as keyof Env] as R2Bucket;
+
+			try {
+				const list = await r2.list();
+				const files = list.objects.map(obj => ({
+					key: obj.key,
+					size: obj.size,
+					uploaded: obj.uploaded,
+					httpEtag: obj.httpEtag,
+				}));
+				return c.json({ bucket, files });
+			} catch (err:any) {
+				return c.json({ error: err.message }, 500);
+			}
 		});
 
 
