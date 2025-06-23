@@ -54,7 +54,7 @@
 			"bucket_name": "images"
 		},
 		{
-			"binding": "VEDEOS_BUCKET",
+			"binding": "VIDEOS_BUCKET",
 			"bucket_name": "videos"
 		},
 		{
