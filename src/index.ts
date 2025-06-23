@@ -48,6 +48,31 @@ export default {
 
 		app.all('/rest/*', authMiddleware, handleRest);
 
+		app.get('/list/:bucket', authMiddleware, async (c) => {
+			const bucket = c.req.param('bucket');
+			const validBuckets = ['images', 'videos', 'models', 'assets'];
+
+			if(!validBuckets.includes(bucket)) {
+				return c.json({ error: 'Invalid bucket' }, 400);
+			}
+
+			const r2 = c.env[`${bucket.toUpperCase}_BUCKET` as keyof Env] as R2Bucket;
+
+			try {
+				const list = await r2.list();
+				const files = list.objects.map(obj => ({
+					key: obj.key,
+					size: obj.size,
+					uploaded: obj.uploaded,
+					httpEtag: obj.httpEtag,
+				}));
+				return c.json({ bucket, files });
+			} catch (err:any) {
+				return c.json({ error: err.message }, 500);
+			}
+		});
+
+
 		app.post('/query', authMiddleware, async (c) => {
 			const body = await c.req.json();
 			const { query, params, db } = body;
@@ -88,31 +113,6 @@ export default {
 
 			return c.json({ success: true, key: filename, url: `${bucketName}/${filename}` });
 		});
-
-		app.get('/list/:bucket', authMiddleware, async (c) => {
-			const bucket = c.req.param('bucket');
-			const validBuckets = ['images', 'videos', 'models', 'assets'];
-
-			if(!validBuckets.includes(bucket)) {
-				return c.json({ error: 'Invalid bucket' }, 400);
-			}
-
-			const r2 = c.env[`${bucket.toUpperCase}_BUCKET` as keyof Env] as R2Bucket;
-
-			try {
-				const list = await r2.list();
-				const files = list.objects.map(obj => ({
-					key: obj.key,
-					size: obj.size,
-					uploaded: obj.uploaded,
-					httpEtag: obj.httpEtag,
-				}));
-				return c.json({ bucket, files });
-			} catch (err:any) {
-				return c.json({ error: err.message }, 500);
-			}
-		});
-
 
 		return app.fetch(request, env, ctx);
 	}
