@@ -106,6 +106,15 @@ export default {
 			return c.json({ success: true, key: filename, url: `${bucketName}/${filename}` });
 		});
 
+		app.delete('/delete/:bucket/:key', async (c) => {
+			const { bucket, key } = c.req.param();
+			const bucketObj = resolveBucket(c.env, bucket);
+			if (!bucketObj) return c.json({ error: 'Invalid bucket' }, 400);
+
+			await bucketObj.delete(decodeURIComponent(key));
+			return c.json({ success: true });
+		});
+
 		return app.fetch(request, env, ctx);
 	}
 } satisfies ExportedHandler<Env>;
