@@ -22,21 +22,6 @@
 			"database_id": "00489470-0c4b-496a-9d14-2e27584ac9a6",
 		},
 		{
-			"binding": "DB_IMAGES",
-			"database_name": "images_db",
-			"database_id": "38ea2004-1d5c-4236-b321-94acc68b1de8"
-		},
-		{
-			"binding": "DB_VIDEOS",
-			"database_name": "videos_db",
-			"database_id": "139959eb-8eed-4d42-a99c-20ab7ce25938"
-		},
-		{
-			"binding": "DB_MODELS",
-			"database_name": "models_db",
-			"database_id": "3330bca8-5a0e-4b99-aa56-c6c20e97ea00"
-		},
-		{
 			"binding": "DB_COMMENTS",
 			"database_name": "comments_db",
 			"database_id": "896572d7-17b3-4c99-849a-150f39dfa789"

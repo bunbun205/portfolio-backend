@@ -5,9 +5,6 @@ import { handleRest } from './rest';
 export interface Env {
 	DB_BLOG: D1Database;
 	DB_PROJECTS: D1Database;
-	DB_IMAGES: D1Database;
-	DB_VIDEOS: D1Database;
-	DB_MODELS: D1Database;
 	DB_COMMENTS: D1Database;
 	DB_USERS: D1Database;
 	SECRET: SecretsStoreSecret;

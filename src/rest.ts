@@ -12,9 +12,6 @@ function sanitizeKeyword(identifier: string): string {
 function resolveDB(env: Env, tableName: string): D1Database | null {
 	if (tableName === 'posts') return env.DB_BLOG;
 	if (tableName === 'projects') return env.DB_PROJECTS;
-	if (tableName === 'images' || tableName === 'image_usage') return env.DB_IMAGES;
-	if (tableName === 'videos' || tableName === 'video_usage') return env.DB_VIDEOS;
-	if (tableName === 'models') return env.DB_MODELS;
 	if (tableName === 'comments') return env.DB_COMMENTS;
 	if (tableName === 'users' || tableName === 'sessions') return env.DB_USERS;
 	return null;
