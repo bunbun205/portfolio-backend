@@ -7,6 +7,7 @@
 	"name": "portfolio-backend",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-20",
+	"account_id": "5d30ffaa14bdc66463c00f0e14e6dd23",
 	"observability": {
 		"enabled": true
 	},
@@ -14,22 +15,22 @@
 		{
 			"binding": "DB_BLOG",
 			"database_name": "blog_db",
-			"database_id": "dd23bf38-9bd7-4ad7-82fa-222ed1e97264",
+			"database_id": "9b33887c-3248-4236-bcb5-e7606fea6785",
 		},
 		{
 			"binding": "DB_PROJECTS",
 			"database_name": "projects_db",
-			"database_id": "00489470-0c4b-496a-9d14-2e27584ac9a6",
+			"database_id": "c8e55f3d-29e3-489e-a0a8-6e37e48949a6",
 		},
 		{
 			"binding": "DB_COMMENTS",
 			"database_name": "comments_db",
-			"database_id": "896572d7-17b3-4c99-849a-150f39dfa789"
+			"database_id": "fa4ed501-8d8d-4257-b414-42580d8873c1"
 		},
 		{
 			"binding": "DB_USERS",
 			"database_name": "users_db",
-			"database_id": "402bf4e6-b930-441b-815a-d73b292ee990"
+			"database_id": "9e5655c5-3413-4970-9805-cb6267d8c5fd"
 		}
 
 	],
@@ -49,6 +50,10 @@
 		{
 			"binding": "ASSETS_BUCKET",
 			"bucket_name": "assets"
+		},
+		{
+			"binding": "THUMBNAILS_BUCKET",
+			"bucket_name": "thumbnails"
 		}
 	],
 	"secrets_store_secrets": [

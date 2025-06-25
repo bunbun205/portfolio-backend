@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS comments (
-  id TEXT PRIMARY KEY, -- UUID
+  id TEXT PRIMARY KEY NOT NULL, -- UUID
   user_id TEXT NOT NULL, -- From users_db.users
   post_id TEXT NOT NULL, -- blog_posts.id or projects.id
   content TEXT NOT NULL,

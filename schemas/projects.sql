@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS projects (
 	thumbnail_url TEXT NOT NULL,
 	category TEXT NOT NULL,
 	description TEXT,
+	likes INTEGER DEFAULT 0,
 	created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

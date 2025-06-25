@@ -13,6 +13,7 @@ export interface Env {
 	VIDEOS_BUCKET: R2Bucket;
 	MODELS_BUCKET: R2Bucket;
 	ASSETS_BUCKET: R2Bucket;
+	THUMBNAILS_BUCKET: R2Bucket;
 }
 
 function resolveBucket(env: Env, bucketName: string): R2Bucket | null {
@@ -21,6 +22,7 @@ function resolveBucket(env: Env, bucketName: string): R2Bucket | null {
 		case 'videos': return env.VIDEOS_BUCKET;
 		case 'models': return env.MODELS_BUCKET;
 		case 'assets': return env.ASSETS_BUCKET;
+		case 'thumbnails': return env.THUMBNAILS_BUCKET;
 		default: return null;
 	}
 }

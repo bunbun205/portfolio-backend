@@ -1,9 +1,7 @@
 CREATE TABLE IF NOT EXISTS posts (
-	id TEXT PRIMARY KEY,
+	id TEXT PRIMARY KEY NOT NULL,
 	title TEXT NOT NULL,
 	content TEXT NOT NULL,
-	date TEXT NOT NULL,
-	image_ids TEXT,
-	video_ids TEXT  
+	likes INTEGER DEFAULT 0,
 	created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
