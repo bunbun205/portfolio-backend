@@ -51,10 +51,6 @@
 			"binding": "ASSETS_BUCKET",
 			"bucket_name": "assets"
 		},
-		{
-			"binding": "THUMBNAILS_BUCKET",
-			"bucket_name": "thumbnails"
-		}
 	],
 	"secrets_store_secrets": [
 		{
