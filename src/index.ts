@@ -61,6 +61,33 @@ export default {
 			}
 		});
 
+		app.get('/preview/:bucket/:key', authMiddleware, async (c) => {
+			const bucketName = c.req.param('bucket');
+			const key = c.req.param('key');
+			const bucket = resolveBucket(c.env, bucketName);
+
+			if (!bucket) {
+				return c.json({ error: `Bucket '${bucketName}' not found` }, 404);
+			}
+
+			try {
+				const obj = await bucket.get(decodeURIComponent(key));
+
+				if (!obj || !obj.body) {
+					return c.json({ error: 'Object not found' }, 404);
+				}
+
+				const headers = new Headers();
+				headers.set(
+					'Content-Type',
+					(obj.httpMetadata && obj.httpMetadata.contentType) || 'application/octet-stream'
+				);
+
+				return new Response(obj.body, { headers });
+			} catch (err: any) {
+				return c.json({ error: err.message || 'Failed to preview object' }, 500);
+			}
+		});
 
 		app.post('/query', authMiddleware, async (c) => {
 			const body = await c.req.json();
