@@ -82,6 +82,7 @@ export default {
 					'Content-Type',
 					(obj.httpMetadata && obj.httpMetadata.contentType) || 'application/octet-stream'
 				);
+				headers.set("Access-Control-Allow-Origin", "*");
 
 				return new Response(obj.body, { headers });
 			} catch (err: any) {
