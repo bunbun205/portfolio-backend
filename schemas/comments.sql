@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS comments (
-  id TEXT PRIMARY KEY NOT NULL, -- UUID
-  user_id TEXT NOT NULL, -- From users_db.users
-  post_id TEXT NOT NULL, -- blog_posts.id or projects.id
+  id TEXT PRIMARY KEY NOT NULL,
+  user_id TEXT NOT NULL,
+  post_id TEXT NOT NULL,
   content TEXT NOT NULL,
-  parent_comment_id TEXT, -- For replies
+  parent_comment_id TEXT,
   likes INTEGER DEFAULT 0,
   flags INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

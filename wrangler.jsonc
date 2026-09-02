@@ -31,6 +31,11 @@
 			"binding": "DB_USERS",
 			"database_name": "users_db",
 			"database_id": "9e5655c5-3413-4970-9805-cb6267d8c5fd"
+		},
+		{
+			"binding": "DB_MAILS",
+			"database_name": "mails_db",
+			"database_id": "5e7f20e5-261c-42b7-8a0b-976fe92aa64a"
 		}
 
 	],
