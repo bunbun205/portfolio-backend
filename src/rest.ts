@@ -14,15 +14,16 @@ function resolveDB(env: Env, tableName: string): D1Database | null {
 	if (tableName === 'projects') return env.DB_PROJECTS;
 	if (tableName === 'comments') return env.DB_COMMENTS;
 	if (tableName === 'users' || tableName === 'sessions') return env.DB_USERS;
+	if (tableName === 'mails') return env.DB_MAILS;
 	return null;
 }
 
-async function handleGet(c: Context<{ Bindings: Env }>, tableName: string, id?: string): Promise<Response> {
+export async function handleRead(c: Context<{ Bindings: Env }>, tableName: string, id?: string): Promise<Response> {
 	const db = resolveDB(c.env, tableName);
 	if (!db) return c.json({ error: 'Invalid table/database' }, 400);
 	const table = sanitizeKeyword(tableName);
 	const searchParams = new URL(c.req.url).searchParams;
-	
+
 	try {
 		let query = `SELECT * FROM ${table}`;
 		const params: any[] = [];
@@ -139,7 +140,7 @@ export async function handleRest(c: Context<{ Bindings: Env }>): Promise<Respons
 	const id = pathParts[2];
 
 	switch (c.req.method) {
-		case 'GET': return handleGet(c, tableName, id);
+		case 'GET': return handleRead(c, tableName, id);
 		case 'POST': return handlePost(c, tableName);
 		case 'PUT':
 		case 'PATCH':

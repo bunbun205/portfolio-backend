@@ -1,12 +1,13 @@
 import { Hono, Context, Next } from "hono";
 import { cors } from "hono/cors";
-import { handleRest } from './rest';
+import { handleRead, handleRest } from './rest';
 
 export interface Env {
 	DB_BLOG: D1Database;
 	DB_PROJECTS: D1Database;
 	DB_COMMENTS: D1Database;
 	DB_USERS: D1Database;
+	DB_MAILS: D1Database;
 	SECRET: SecretsStoreSecret;
 
 	IMAGES_BUCKET: R2Bucket;
@@ -45,8 +46,15 @@ export default {
 
 		app.all('/rest/*', authMiddleware, handleRest);
 
+		// The portfolio only needs to expose published content. Keep all other
+		// database access behind the authenticated /rest API.
+		app.get('/posts', (c) => handleRead(c, 'posts'));
+		app.get('/posts/:id', (c) => handleRead(c, 'posts', c.req.param('id') ?? ''));
+		app.get('/projects', (c) => handleRead(c, 'projects'));
+		app.get('/projects/:id', (c) => handleRead(c, 'projects', c.req.param('id') ?? ''));
+
 		app.get('/list/:bucket', authMiddleware, async (c) => {
-			const bucketName = c.req.param('bucket');
+			const bucketName = c.req.param('bucket') ?? '';
 			const bucket = resolveBucket(c.env, bucketName);
 
 			if (!bucket) {
@@ -61,9 +69,9 @@ export default {
 			}
 		});
 
-		app.get('/preview/:bucket/:key', authMiddleware, async (c) => {
-			const bucketName = c.req.param('bucket');
-			const key = c.req.param('key');
+		const serveFile = async (c: Context<{ Bindings: Env }>) => {
+			const bucketName = c.req.param('bucket') ?? '';
+			const key = c.req.param('key') ?? '';
 			const bucket = resolveBucket(c.env, bucketName);
 
 			if (!bucket) {
@@ -88,33 +96,17 @@ export default {
 			} catch (err: any) {
 				return c.json({ error: err.message || 'Failed to preview object' }, 500);
 			}
-		});
+		};
 
-		app.post('/query', authMiddleware, async (c) => {
-			const body = await c.req.json();
-			const { query, params, db } = body;
-
-			if (!query || !db) {
-				return c.json({ error: 'Query and db are required' }, 400);
-			}
-
-			const selectedDb = (env as any)[`DB_${db.toUpperCase()}`] as D1Database;
-			if (!selectedDb) {
-				return c.json({ error: `Invalid database: ${db}` }, 400);
-			}
-
-			try {
-				const result = await selectedDb.prepare(query).bind(...(params || [])).all();
-				return c.json(result);
-			} catch (error: any) {
-				return c.json({ error: error.message }, 500);
-			}
-		});
+		// Public asset reads are deliberately separate from the authenticated
+		// preview route, which remains available for admin tooling.
+		app.get('/file/:bucket/:key{.+}', serveFile);
+		app.get('/preview/:bucket/:key{.+}', authMiddleware, serveFile);
 
 		// Upload asset to R2
 		app.put('/upload/:bucket/:filename', authMiddleware, async (c) => {
-			const bucketName = c.req.param('bucket');
-			const filename = c.req.param('filename');
+			const bucketName = c.req.param('bucket') ?? '';
+			const filename = c.req.param('filename') ?? '';
 
 			if (!['images', 'videos', 'models', 'assets'].includes(bucketName)) {
 				return c.json({ error: 'Invalid bucket' }, 400);
@@ -131,13 +123,45 @@ export default {
 			return c.json({ success: true, key: filename, url: `${bucketName}/${filename}` });
 		});
 
-		app.delete('/delete/:bucket/:key', async (c) => {
-			const { bucket, key } = c.req.param();
+		app.delete('/delete/:bucket/:key{.+}', authMiddleware, async (c) => {
+			const { bucket = '', key = '' } = c.req.param();
 			const bucketObj = resolveBucket(c.env, bucket);
 			if (!bucketObj) return c.json({ error: 'Invalid bucket' }, 400);
 
 			await bucketObj.delete(decodeURIComponent(key));
 			return c.json({ success: true });
+		});
+
+		app.post('/contact', async (c) => {
+			let body: any;
+			try {
+				body = await c.req.json();
+			} catch {
+				return c.json({ error: 'Invalid JSON body' }, 400);
+			}
+
+			const { name, email, message } = body ?? {};
+			if (typeof name !== 'string' || !name.trim()) {
+				return c.json({ error: 'Name is required' }, 400);
+			}
+			if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+				return c.json({ error: 'A valid email is required' }, 400);
+			}
+			if (typeof message !== 'string' || !message.trim()) {
+				return c.json({ error: 'Message is required' }, 400);
+			}
+
+			const id = crypto.randomUUID();
+
+			try {
+				await c.env.DB_MAILS.prepare(
+					'INSERT INTO mails (id, name, email, message) VALUES (?, ?, ?, ?)'
+				).bind(id, name.trim(), email.trim(), message.trim()).run();
+
+				return c.json({ success: true }, 201);
+			} catch (err: any) {
+				return c.json({ error: err.message || 'Failed to save message' }, 500);
+			}
 		});
 
 		return app.fetch(request, env, ctx);
